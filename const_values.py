@@ -19,3 +19,9 @@ def max_fee_rate():
 
 def test_times():
     return 7000
+
+def year_after_retire_with_optional():
+    return 20
+
+def year_after_retire_with_optional_reduce():
+    return 20
