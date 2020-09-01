@@ -18,4 +18,4 @@ def max_fee_rate():
     return 10.0
 
 def test_times():
-    return 2000
+    return 7000

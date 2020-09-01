@@ -20,7 +20,13 @@ if __name__ == "__main__":
     month_amount = int(input(tips_month_amount))
     years = int(input(tips_years))
     target_amount = int(input(tips_target_amount))
-
+     
+    while target_amount < month_amount or years < 1 or month_amount < 1:
+        print(tips_stupid)
+        month_amount = int(input(tips_month_amount))
+        years = int(input(tips_years))
+        target_amount = int(input(tips_target_amount))
+        
     fund_code = input(tips_code)
     while fund_code != "0":
         # 先查询历史净值
@@ -29,14 +35,15 @@ if __name__ == "__main__":
         # 至少需要10个值才有意义执行下一步
         nav_amount = len(fund_nav)
         final_values = []
-        success_case_amount = 0
+        half_way_success_case_amount = 0
+        final_success_case_amount = 0
         if nav_amount > 10:
             fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm_var = get_mean_and_var_from_history_nav.analysis_fund(fund_nav, 0)
             if (abs(fund_nav_increase_logarithm_mean) > const_values.zero_float() or abs(fund_nav_increase_logarithm_var) > const_values.zero_float()):
                 
                 fee_rate = float(input(tips_fee_rate)) / 100.0
-                
-                if (target_amount < month_amount or years < 1 or month_amount < 1 or fee_rate < const_values.zero_float("NEG") or fee_rate > const_values.max_fee_rate()):
+                t = time.time()
+                if (fee_rate < const_values.zero_float("NEG") or fee_rate > const_values.max_fee_rate()):
                     print(tips_stupid)
                 else:
                     # 修正费率
@@ -51,16 +58,21 @@ if __name__ == "__main__":
                         final_values.append(single_account_values[-1])
                         # 如果账户到达过目标值，记录一个成功
                         #print(max(single_account_values))
+                        if single_account_values[-1] >= target_amount:
+                            final_success_case_amount += 1
                         if max(single_account_values) >= target_amount:
-                            success_case_amount += 1
+                            half_way_success_case_amount += 1
                     # 计算均值
                     expected_final_value = int(numpy.average(final_values))
                     # 计算成功率
-                    success_rate_bp = 10000 * success_case_amount / len(account_values_simulate)
-                    success_rate_float = success_rate_bp / 100.00
+                    total_cases = len(account_values_simulate)
+                    half_way_success_rate = 10000 * half_way_success_case_amount / total_cases / 100.00
+                    final_success_rate = 10000 * final_success_case_amount / total_cases / 100.00
                     # 打印结果
-                    print("如果闭眼按计划定投，你的账户终值的预期值是" + str(expected_final_value) + "元。")
-                    print("如果决定见好就收的话，你有" + str(success_rate_float) + "%的概率在投资周期结束时或者之前，实现养老自由。")
+                    t = time.time() - t
+                    # print("计算耗时：" , t, "s")
+                    print("如果闭眼按计划定投，你的账户终值的预期值是" + str(expected_final_value) + "元，并有" + str(final_success_rate) + "%的概率在投资周期结束时实现养老自由。")
+                    print("如果决定见好就收的话，你有" + str(half_way_success_rate) + "%的概率在投资周期结束时或者之前，实现养老自由。")
             else:
                 print("错误信息：基金历史未获得正确结果！")
         else:
