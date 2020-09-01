@@ -4,6 +4,7 @@ import monte_carlo
 import timing_invest_simulate
 import const_values
 import numpy
+import time
 
 # 调试入口：单个基金的定投模拟结果输出
 if __name__ == "__main__":
