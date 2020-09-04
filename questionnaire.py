@@ -1,80 +1,7 @@
+import get_fund_nav_from_file
 import const_values
 
-def datasource(income_active, income_passive, basic_expense, optional_expense, loan, loan_left, kid_expense, kid_left, insurance, insurance_left, retire_year, retire_income, inflation, income_growth):
-    income_active_total_year = []
-    income_passive_total_year = []
-    basic_expense_year = []
-    optional_expense_year = []
-    loan_year = []
-    kid_expense_year = []
-    insurance_year = []
-    income_year = []
-    expense_year = []
-
-    # 退休后，可选消费维持原水平的年份
-    year_after_retire_with_optional = const_values.year_after_retire_with_optional()
-    # 退休一段是假后，可选消费从原水平逐渐递减为0的年份
-    year_after_retire_with_optional_reduce = const_values.year_after_retire_with_optional_reduce
-
-    for i in range(retire_year):
-        if i == 0:
-            income_active_total_year.append(income_active * 1.0)
-            income_passive_total_year.append(income_passive * 1.0)
-            basic_expense_year.append(basic_expense * 1.0)
-            optional_expense_year.append(optional_expense * 1.0)
-            loan_year.append(loan * 1.0)
-            kid_expense_year.append(kid_expense * 1.0)
-            insurance_year.append(insurance * 1.0)
-        else:
-            income_active_total_year.append(income_active_total_year[-1] * (income_growth + 1.0))
-            income_passive_total_year.append(income_passive_total_year[-1] * (income_growth + 1.0))
-            basic_expense_year.append(basic_expense_year[-1] * (inflation + 1.0))
-            optional_expense_year.append(optional_expense_year[-1] * (inflation + 1.0))
-            if loan_left > i:
-                loan_year.append(loan * 1.0)
-            else:
-                loan_year.append(0.0)
-            if kid_expense_year > i:
-                kid_expense_year.append(kid_expense_year[-1] * (inflation + 1.0))
-            else:
-                kid_expense_year.append(0.0)
-            if insurance_left > i:
-                insurance_year.append(insurance * 1.0)
-            else:
-                insurance_year.append(0.0)
-    for i in range(retire_year, retire_year + year_after_retire_with_optional):
-        if i == retire_year:
-            # 退休当年，用退休替代率处理主动收入
-            income_active_total_year.append(income_active_total_year[-1] * (income_growth + 1.0) * retire_income)
-        else:
-            income_active_total_year.append(income_active_total_year[-1] * (income_growth + 1.0))
-        income_passive_total_year.append(income_passive_total_year[-1] * (income_growth + 1.0))
-        basic_expense_year.append(basic_expense_year[-1] * (inflation + 1.0))
-        optional_expense_year.append(optional_expense_year[-1] * (inflation + 1.0))
-        if loan_left > i:
-            loan_year.append(loan * 1.0)
-        else:
-            loan_year.append(0.0)
-        if kid_expense_year > i:
-            kid_expense_year.append(kid_expense_year[-1] * (inflation + 1.0))
-        else:
-            kid_expense_year.append(0.0)
-        if insurance_left > i:
-            insurance_year.append(insurance * 1.0)
-        else:
-            insurance_year.append(0.0)
-    for i in range(retire_year + year_after_retire_with_optional, retire_year + year_after_retire_with_optional + year_after_retire_with_optional_reduce):
-        income_active_total_year.append(income_active_total_year[-1] * (income_growth + 1.0))
-        income_passive_total_year.append(income_passive_total_year[-1] * (income_growth + 1.0))
-        basic_expense_year.append(basic_expense_year[-1] * (inflation + 1.0))
-        # 可选消费递减处理
-        optional_expense_year.append(optional_expense_year[-1] * (inflation + 1.0) * (retire_year + year_after_retire_with_optional + year_after_retire_with_optional_reduce - i) / year_after_retire_with_optional_reduce)
-        loan_year.append(0.0)
-        kid_expense_year.append(0.0)
-        insurance_year.append(0.0)
-    # 接下来需要计算收支各自汇总
-# 调试入口：家庭问卷
-if __name__ == "__main__":
+def family():
     tips = "AI吴小蔚梦游中为你服务，请勿当真。\n程序可以离线运行，隐私随便说。"#\n请确保要模拟的基金净值数据已经导入到./history/文件夹。"
     tips_income_active = "家庭年收入（主动收入，单位：元）？"
     tips_income_passive = "家庭年被动收入（诸如收租子、家庭信托等，单位：元）？"
@@ -149,3 +76,71 @@ if __name__ == "__main__":
     while income_growth < -0.1 or income_growth > 0.2:
         print(tips_stupid)
         income_growth = float(input(tips_income_growth)) / 100.0
+
+    return income_active, income_passive, basic_expense, optional_expense, loan, loan_left, kid_expense, kid_left, insurance, insurance_left, retire_year, retire_income, inflation, income_growth
+
+def fund_analysis():
+    tips_code = "输入基金代码，输入0退出。（特殊代码：1：保险年金；2：沪深300；3：中证500；4：上证50；5：创业板）"
+    tips_fund_error = "没找到这个基金，或者这个基金的可用数据太少，请换一个。"
+    
+    fund_code = input(tips_code)
+    if fund_code != "0":
+        # 先查询历史净值
+        fund_history_filename = "./history/" + fund_code + ".txt"
+        fund_nav = get_fund_nav_from_file.do_get(fund_history_filename)
+        nav_amount = len(fund_nav)
+        # 至少需要10个值才有意义处理这个基金
+        while nav_amount < 10 and (fund_code != "0"):
+            print(tips_fund_error)
+            fund_code = input(tips_code)
+            fund_history_filename = "./history/" + fund_code + ".txt"
+            fund_nav = get_fund_nav_from_file.do_get(fund_history_filename)
+            nav_amount = len(fund_nav)
+    # 此处不用else是因为可能用户重新输入的code为0，需要再判断
+    if fund_code == "0":
+        return "0", "0"
+
+    
+    return fund_code, fund_nav
+
+def fund_invest():
+    tips_code = "输入基金代码，输入0退出。（特殊代码：1：保险年金；2：沪深300；3：中证500；4：上证50；5：创业板）"
+    tips_month_amount = "你每月想定投多少钱（按周定投没写，要的话自己改程序）？比如1000块就输入1000："
+    tips_years = "你想定投几年？"
+    tips_fee_rate = "交易手续费是百分几？输入0.5表示0.5%："
+    tips_target_amount = "你觉得有多少钱算养老自由？比如想100万就输入1000000："
+    tips_fund_error = "没找到这个基金，或者这个基金的可用数据太少，请换一个。"
+    tips_stupid = "你他妈输入的啥玩意儿"
+    
+    fund_code = input(tips_code)
+    if fund_code != "0":
+        # 先查询历史净值
+        fund_history_filename = "./history/" + fund_code + ".txt"
+        fund_nav = get_fund_nav_from_file.do_get(fund_history_filename)
+        nav_amount = len(fund_nav)
+        # 至少需要10个值才有意义处理这个基金
+        while nav_amount < 10 and (fund_code != "0"):
+            print(tips_fund_error)
+            fund_code = input(tips_code)
+            fund_history_filename = "./history/" + fund_code + ".txt"
+            fund_nav = get_fund_nav_from_file.do_get(fund_history_filename)
+            nav_amount = len(fund_nav)
+    # 此处不用else是因为可能用户重新输入的code为0，需要再判断
+    if fund_code == "0":
+            return "0", "0", "0", "0", "0", "0"
+
+    month_amount = int(input(tips_month_amount))
+    years = int(input(tips_years))
+    fee_rate = float(input(tips_fee_rate)) / 100.0
+    target_amount = int(input(tips_target_amount))
+
+    while target_amount < month_amount or years < 1 or month_amount < 1 or fee_rate < const_values.zero_float("NEG") or fee_rate > const_values.max_fee_rate():
+        print(tips_stupid)
+        month_amount = int(input(tips_month_amount))
+        years = int(input(tips_years))
+        fee_rate = float(input(tips_fee_rate)) / 100.0
+        target_amount = int(input(tips_target_amount))
+    # 手续费0的修正
+    if fee_rate < const_values.zero_float():
+        fee_rate = 0.0
+    return fund_code, fund_nav, month_amount, years, fee_rate, target_amount
