@@ -37,8 +37,8 @@ def show(fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm_var, year
     # 打印结果
     t = time.time() - t
     # print("计算耗时：" , t, "s")
-    print("如果闭眼按计划定投，你的账户终值的预期值是" + str(expected_final_value) + "元，并有" + str(final_success_rate) + "%的概率在投资周期结束时实现养老自由。")
-    print("如果决定见好就收的话，你有" + str(half_way_success_rate) + "%的概率在投资周期结束时或者之前，实现养老自由。")
+    print("如果闭眼按计划定投，你的账户终值的预期值是%.2f万元，并有%.2f%%的概率在投资周期结束时实现养老自由。"%(expected_final_value/10000.0,final_success_rate))
+    print("如果决定见好就收的话，你有%.2f%%的概率在投资周期结束时或者之前，实现养老自由。"%(half_way_success_rate,))
     if (fund_code != "1"):
         showchart(final_values, fund_code)
     else:
