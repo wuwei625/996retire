@@ -47,12 +47,10 @@ def get_nav_matrix(target_mean, target_var, array_amount, array_length):
             sub_result.append(tmp)
         pool.close()
         pool.join()
-        # TO DO:虽然前面并发计算快，但是合并数组仍然很慢
         for i in range(0, processor_number_available):
             result.extend(sub_result[i].get())
     else:
         # 单进程
-        logarithm_matrix = get_matrix_by_mean_and_var(target_mean, target_var, array_amount, array_length).tolist()
-        result = append_nav_list_to_matrix(logarithm_matrix)
+        result = internal_get_nav_matrix(target_mean, target_var, array_amount, array_length).tolist()
 
     return result

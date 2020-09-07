@@ -17,11 +17,11 @@ if __name__ == "__main__":
             if (abs(fund_nav_increase_logarithm_mean) > const_values.zero_float() or abs(fund_nav_increase_logarithm_var) > const_values.zero_float()):
                 expected_year_rate, expect_year_std_var = get_mean_and_var_from_history_nav.mean_var_trans(fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm_var, const_values.days("YEAR"))
                 if (fund_nav_increase_logarithm_var < const_values.zero_float()):
-                    print("基金日增长率对数的均值是" + str(fund_nav_increase_logarithm_mean))
-                    print("这个基金的历史年化收益率是" + str(expected_year_rate - 1.0) + "，基本没有波动。")
+                    print("基金日增长率对数的均值是%.3e"%(fund_nav_increase_logarithm_mean))
+                    print("这个基金的历史年化收益率是%.2f%%",(expected_year_rate - 1.0) + "，基本没有波动。")
                 else:
-                    print("基金日增长率对数的均值是" + str(fund_nav_increase_logarithm_mean) + "，方差是" + str(fund_nav_increase_logarithm_var))
-                    print("这个基金的历史年化收益率是" + str(expected_year_rate - 1.0) + "，历史年化波动率是" + str(expect_year_std_var))
+                    print("基金日增长率对数的均值是%.3e，方差是%.3e"%(fund_nav_increase_logarithm_mean,fund_nav_increase_logarithm_var))
+                    print("这个基金的历史年化收益率是%.2f%%，历史年化波动率是%.2f%%"%((expected_year_rate - 1.0)*100,expect_year_std_var*100))
             else:
                 print(tips_warning)
         else:
