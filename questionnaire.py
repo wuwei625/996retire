@@ -1,7 +1,7 @@
 import get_fund_nav_from_file
 import const_values
 
-def family():
+def family_raw_data():
     tips = "AI吴小蔚梦游中为你服务，请勿当真。\n程序可以离线运行，隐私随便说。"#\n请确保要模拟的基金净值数据已经导入到./history/文件夹。"
     tips_income_active = "家庭年收入（主动收入，单位：元）？"
     tips_income_passive = "家庭年被动收入（诸如收租子、家庭信托等，单位：元）？"
@@ -16,7 +16,7 @@ def family():
     tips_retire_year = "你们想几年后退休？"
     tips_retire_income = "退休后收入预计占现在主动收入的百分比（25%的话写25，收入在社保封顶线附近大约25）？"
     tips_inflation = "你觉得通胀百分几（3%写3，我觉得3差不多）？"
-    tips_income_growth = "你觉得收入增长百分几（4%写4，你要不会写就写4吧）？"
+    tips_income_growth = "你觉得收入增长百分几（3%写3，你要不会写就写3吧）？"
     tips_stupid = "你他妈输入的啥玩意儿"
 
     print(tips)
