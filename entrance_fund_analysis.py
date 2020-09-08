@@ -1,5 +1,7 @@
-import questionnaire
-import get_mean_and_var_from_history_nav
+# 基金分析的调试入口
+
+import internal_questionnaire
+import internal_fund_data_process
 import const_values
 
 # 调试入口：单个基金的历史分析输出
@@ -8,14 +10,14 @@ if __name__ == "__main__":
     tips_warning = "警告信息：基金的增长率和波动率均为0，可能历史业绩均为固定值，也可能未获得正确结果。"
     tips_error = "错误信息：没有获取到净值历史，或者数据太少，无法完成操作。"
     print(tips)
-    fund_code, fund_nav = questionnaire.fund_analysis()
+    fund_code, fund_nav = internal_questionnaire.fund_analysis()
     while fund_code != "0":
         nav_amount = len(fund_nav)
         if nav_amount > 10:
             print("共导入" + str(nav_amount) + "个历史净值参与分析")
-            fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm_var = get_mean_and_var_from_history_nav.analysis_fund(fund_nav, 0)
+            fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm_var = internal_fund_data_process.analysis_fund(fund_nav, 0)
             if (abs(fund_nav_increase_logarithm_mean) > const_values.zero_float() or abs(fund_nav_increase_logarithm_var) > const_values.zero_float()):
-                expected_year_rate, expect_year_std_var = get_mean_and_var_from_history_nav.mean_var_trans(fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm_var, const_values.days("YEAR"))
+                expected_year_rate, expect_year_std_var = internal_fund_data_process.mean_var_trans(fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm_var, const_values.days("YEAR"))
                 if (fund_nav_increase_logarithm_var < const_values.zero_float()):
                     print("基金日增长率对数的均值是%.3e"%(fund_nav_increase_logarithm_mean))
                     print("这个基金的历史年化收益率是%.2f%%",(expected_year_rate - 1.0) + "，基本没有波动。")
@@ -26,5 +28,5 @@ if __name__ == "__main__":
                 print(tips_warning)
         else:
             print (tips_error)
-        fund_code, fund_nav = questionnaire.fund_analysis()
+        fund_code, fund_nav = internal_questionnaire.fund_analysis()
     exit()

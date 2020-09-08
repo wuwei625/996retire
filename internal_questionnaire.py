@@ -1,4 +1,4 @@
-import get_fund_nav_from_file
+import internal_fund_data_process
 import const_values
 
 def family_raw_data():
@@ -15,6 +15,8 @@ def family_raw_data():
     tips_insurance_left = "保险还要交几年？"
     tips_retire_year = "你们想几年后退休？"
     tips_retire_income = "退休后收入预计占现在主动收入的百分比（25%的话写25，收入在社保封顶线附近大约25）？"
+    tips_current_liquidity = "你家目前的净流动资产有多少？（存款+货币基金+银行短期理财-信用卡等短期负债，单位：元）"
+    tips_current_non_liquidity = "你家目前的投资性金融资产有多少？（非货币基金、股票、万能投连险等用于投资增值的资产，单位：元）"
     tips_inflation = "你觉得通胀百分几（3%写3，我觉得3差不多）？"
     tips_income_growth = "你觉得收入增长百分几（3%写3，你要不会写就写3吧）？"
     tips_stupid = "你他妈输入的啥玩意儿"
@@ -68,6 +70,11 @@ def family_raw_data():
     while retire_income < 0.0:
         print(tips_stupid)
         float(input(tips_retire_income)) / 100.0
+    current_liquidity = int(input(tips_current_liquidity))
+    current_non_liquidity = int(input(tips_current_non_liquidity))
+    while current_non_liquidity < 0:
+        print(tips_stupid)
+        current_non_liquidity = int(input(tips_current_non_liquidity))
     inflation = float(input(tips_inflation)) / 100.0
     while inflation < -0.1 or inflation > 0.2:
         print(tips_stupid)
@@ -77,7 +84,7 @@ def family_raw_data():
         print(tips_stupid)
         income_growth = float(input(tips_income_growth)) / 100.0
 
-    return income_active, income_passive, basic_expense, optional_expense, loan, loan_left, kid_expense, kid_left, insurance, insurance_left, retire_year, retire_income, inflation, income_growth
+    return income_active, income_passive, basic_expense, optional_expense, loan, loan_left, kid_expense, kid_left, insurance, insurance_left, retire_year, retire_income, inflation,current_liquidity, current_non_liquidity, income_growth
 
 def fund_analysis():
     tips_code = "输入基金代码，输入0退出。（特殊代码：1：保险年金；2：沪深300；3：中证500；4：上证50；5：创业板）"
@@ -87,14 +94,14 @@ def fund_analysis():
     if fund_code != "0":
         # 先查询历史净值
         fund_history_filename = "./history/" + fund_code + ".txt"
-        fund_nav = get_fund_nav_from_file.do_get(fund_history_filename)
+        fund_nav = internal_fund_data_process.do_get(fund_history_filename)
         nav_amount = len(fund_nav)
         # 至少需要10个值才有意义处理这个基金
         while nav_amount < 10 and (fund_code != "0"):
             print(tips_fund_error)
             fund_code = input(tips_code)
             fund_history_filename = "./history/" + fund_code + ".txt"
-            fund_nav = get_fund_nav_from_file.do_get(fund_history_filename)
+            fund_nav = internal_fund_data_process.do_get(fund_history_filename)
             nav_amount = len(fund_nav)
     # 此处不用else是因为可能用户重新输入的code为0，需要再判断
     if fund_code == "0":
@@ -116,14 +123,14 @@ def fund_invest():
     if fund_code != "0":
         # 先查询历史净值
         fund_history_filename = "./history/" + fund_code + ".txt"
-        fund_nav = get_fund_nav_from_file.do_get(fund_history_filename)
+        fund_nav = internal_fund_data_process.do_get(fund_history_filename)
         nav_amount = len(fund_nav)
         # 至少需要10个值才有意义处理这个基金
         while nav_amount < 10 and (fund_code != "0"):
             print(tips_fund_error)
             fund_code = input(tips_code)
             fund_history_filename = "./history/" + fund_code + ".txt"
-            fund_nav = get_fund_nav_from_file.do_get(fund_history_filename)
+            fund_nav = internal_fund_data_process.do_get(fund_history_filename)
             nav_amount = len(fund_nav)
     # 此处不用else是因为可能用户重新输入的code为0，需要再判断
     if fund_code == "0":

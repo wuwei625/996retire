@@ -2,7 +2,7 @@
 
 import const_values
 
-def init_data_source(income_active, income_passive, basic_expense, optional_expense, loan, loan_left, kid_expense, kid_left, insurance, insurance_left, retire_year, retire_income, inflation, income_growth):
+def data_source(income_active, income_passive, basic_expense, optional_expense, loan, loan_left, kid_expense, kid_left, insurance, insurance_left, retire_year, retire_income, inflation, income_growth):
     income_active_year = []      # 逐年主动收入
     income_passive_year = []     # 逐年被动收入
     basic_expense_year = []      # 逐年基本支出
@@ -98,8 +98,21 @@ def split_cash_flow(net_cash_flow, retire_year):
     cf_after_retire = []
     year_after_retire_with_optional = const_values.year_after_retire_with_optional()
     year_after_retire_with_optional_reduce = const_values.year_after_retire_with_optional_reduce()
+    # TODO:退休前现金流应该结合当前现金做正负方向的调整
     for i in range(retire_year):
         cf_before_retire.append(net_cash_flow[i])
     for i in range(year_after_retire_with_optional + year_after_retire_with_optional_reduce):
         cf_after_retire.append(net_cash_flow[i + retire_year])
     return cf_before_retire,cf_after_retire
+
+# 可投资现金流是退休前的现金流，并且把建议的存量金融投资资产一次性加入首年，未来算法可以进一步优化
+def get_investable_cf(suggested_non_liquidity, cf_before_retire):
+    cf_investable = []
+    i = 0
+    for value in cf_before_retire:
+        if i == 0:
+            cf_investable.append(suggested_non_liquidity + value)
+        else:
+            cf_investable.append(value)
+        i += 1
+    return cf_investable
