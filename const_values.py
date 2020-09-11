@@ -10,6 +10,18 @@ def days(days_type):
         return 5
     else:
         return 1
+# 一年的投资周期数量
+def period_times(period_type = "MONTH"):
+    if period_type == "MONTH":
+        return 12
+    elif period_type == "DAY":
+        return 244
+    elif period_type == "WEEK":
+        return 50
+    elif period_type == "YEAR":
+        return 1
+    else:
+        return 1
 
 # float的0
 def zero_float(zero_type=""):
