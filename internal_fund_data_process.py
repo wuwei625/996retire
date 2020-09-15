@@ -1,38 +1,15 @@
-import os
+import util_func
+import const_values
+import internal_history_file
+
 import math
 import numpy
+import functools
 
-# 根据文件名，读取历史净值记录
-def do_get(fund_history_filename):
-    fund_nav = []
-    line_amount = 0
-    illegal_amount = 0
-
-    try:
-        with open(fund_history_filename, encoding='utf-8') as f_history:
-            line = f_history.readline()
-            while line:
-                line_amount += 1
-                line = line.strip()
-                # 尝试将读取到的净值转为float
-                try:
-                    nav_single = float(line)
-                except:
-                    nav_single = 0.0
-                # 判断数据合法性
-                if nav_single > 0.00001:
-                    fund_nav.append(nav_single)
-                else:
-                    print("警告：排除疑似非法的数据在第" + str(line_amount) + "行：" + line)
-                    illegal_amount += 1
-                # 处理下一行
-                line = f_history.readline()
-        f_history.close()
-    except:
-        print("错误信息：净值文档" + fund_history_filename + "分析发生错误！")
-    # 输出错误信息
-    if (illegal_amount > 0):
-        print("错误信息：净值文件中有" + str(illegal_amount) + "条记录格式或者值非法。")
+# 根据代码获取基金历史净值序列
+def get_nav(fund_code):
+    fund_history_filename = const_values.history_path() + fund_code + ".txt"
+    fund_nav = internal_history_file.get_nav_from_file(fund_history_filename)
     return fund_nav
 
 # 获取日增长率均值和方差
@@ -71,3 +48,31 @@ def mean_var_trans(fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm
         print("错误信息：日均值和方差有误！")
 
     return expected_year_rate, expect_year_std_var
+
+# 获取Risk Adjusted Return
+def get_rar(fund_code):
+    fund_nav = get_nav(fund_code)
+    rfr_d, var_d = analysis_fund(get_nav(const_values.special_code("ANNUAL")), 0)
+    fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm_var = analysis_fund(fund_nav, 0)
+    if (util_func.is_float_zero(fund_nav_increase_logarithm_var)):
+        return const_values.get_error_float()
+    else:
+        return (fund_nav_increase_logarithm_mean - rfr_d) / fund_nav_increase_logarithm_var
+
+# 获取未排序基金列表
+def fund_list():
+    return internal_history_file.fund_list(const_values.history_path())
+
+# 排序逻辑
+def cmp_fund(fund0, fund1):
+    if get_rar(fund0) < get_rar(fund1):
+        return 1
+    if get_rar(fund0) > get_rar(fund1):
+        return -1
+    return 0
+
+# 获取按Risk Adjusted Return排序的基金列表
+def rar_sorted_list():
+    raw_list = fund_list()
+    sorted_list = sorted(raw_list, key=functools.cmp_to_key(cmp_fund))
+    return sorted_list

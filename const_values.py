@@ -1,5 +1,29 @@
 # 各种可能用到的常数
 
+# 公共提示信息
+def tips_ask_fund():
+    return "输入基金代码，输入0退出。（特殊代码：1：保险年金；2：沪深300；3：中证500；4：上证50；5：创业板；list：查看所有）"
+
+def tips_stupid():
+    return "你他妈输入的啥玩意儿"
+
+def tips_fund_error():
+    return "没找到这个基金，或者这个基金的可用数据太少，请换一个。"
+    
+# 历史数据路径
+def history_path():
+    return "./history/"
+
+def special_code(special_type = "EXIT"):
+    if special_type == "EXIT":
+        return "0"
+    elif special_type == "ANNUAL":
+        return "1"
+    elif special_type == "LS":
+        return "list"
+    else:
+        return "0"
+        
 # 周期内交易日数量
 def days(days_type):
     if days_type == "YEAR":
@@ -10,6 +34,7 @@ def days(days_type):
         return 5
     else:
         return 1
+
 # 一年的投资周期数量
 def period_times(period_type = "MONTH"):
     if period_type == "MONTH":
@@ -61,13 +86,6 @@ def irr_retry_limit():
 # 约定的报错时float的输出值
 def get_error_float():
     return -4444.44
-
-# 判断float是否报错值
-def is_float_error(test_float):
-    if abs(test_float - get_error_float()) <= zero_float():
-        return True
-    else:
-        return False
 
 # 默认趸交年金利率
 def default_annual_return_rate():

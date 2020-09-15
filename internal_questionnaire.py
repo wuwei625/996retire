@@ -1,5 +1,6 @@
 import internal_fund_data_process
 import const_values
+import util_func
 
 def family_raw_data():
     tips = "AI吴小蔚梦游中为你服务，请勿当真。\n程序可以离线运行，隐私随便说。"#\n请确保要模拟的基金净值数据已经导入到./history/文件夹。"
@@ -19,7 +20,7 @@ def family_raw_data():
     tips_current_non_liquidity = "你家目前的投资性金融资产有多少？（非货币基金、股票、万能投连险等用于投资增值的资产，单位：元）"
     tips_inflation = "你觉得通胀百分几（3%写3，我觉得3差不多）？"
     tips_income_growth = "你觉得收入增长百分几（3%写3，你要不会写就写3吧）？"
-    tips_stupid = "你他妈输入的啥玩意儿"
+    tips_stupid = const_values.tips_stupid()
 
     print(tips)
     income_active = int(input(tips_income_active))
@@ -87,70 +88,69 @@ def family_raw_data():
     return income_active, income_passive, basic_expense, optional_expense, loan, loan_left, kid_expense, kid_left, insurance, insurance_left, retire_year, retire_income, inflation,current_liquidity, current_non_liquidity, income_growth
 
 def fund_analysis():
-    tips_code = "输入基金代码，输入0退出。（特殊代码：1：保险年金；2：沪深300；3：中证500；4：上证50；5：创业板）"
-    tips_fund_error = "没找到这个基金，或者这个基金的可用数据太少，请换一个。"
+    tips_code = const_values.tips_ask_fund()
+    tips_fund_error = const_values.tips_fund_error()
     
     fund_code = input(tips_code)
-    if fund_code != "0":
+    if not (util_func.isExitCode(fund_code) or util_func.isLs(fund_code)):
         # 先查询历史净值
-        fund_history_filename = "./history/" + fund_code + ".txt"
-        fund_nav = internal_fund_data_process.do_get(fund_history_filename)
+        fund_nav = internal_fund_data_process.get_nav(fund_code)
         nav_amount = len(fund_nav)
         # 至少需要10个值才有意义处理这个基金
-        while nav_amount < 10 and (fund_code != "0"):
+        while nav_amount < 10 and (not util_func.isExitCode(fund_code)) and (not util_func.isLs(fund_code)):
             print(tips_fund_error)
             fund_code = input(tips_code)
-            fund_history_filename = "./history/" + fund_code + ".txt"
-            fund_nav = internal_fund_data_process.do_get(fund_history_filename)
+            fund_nav = internal_fund_data_process.get_nav(fund_code)
             nav_amount = len(fund_nav)
-    # 此处不用else是因为可能用户重新输入的code为0，需要再判断
-    if fund_code == "0":
-        return "0", "0"
-
     
-    return fund_code, fund_nav
+    if util_func.isExitCode(fund_code):
+        return const_values.special_code("EXIT"), "0"
+    elif util_func.isLs(fund_code):
+        return const_values.special_code("LS"), "0"
+    else:    
+        return fund_code, fund_nav
 
 def fund_invest():
-    tips_code = "输入基金代码，输入0退出。（特殊代码：1：保险年金；2：沪深300；3：中证500；4：上证50；5：创业板）"
+    tips_code = const_values.tips_ask_fund()
     tips_month_amount = "你每月想定投多少钱（按周定投没写，要的话自己改程序）？比如1000块就输入1000："
     tips_invest_years = "你想定投几年？"
     tips_terminate_years = "从第一笔开始算，几年结束投资？"
     tips_fee_rate = "交易手续费是百分几？输入0.5表示0.5%："
     tips_target_amount = "你觉得有多少钱算养老自由？比如想100万就输入1000000："
-    tips_fund_error = "没找到这个基金，或者这个基金的可用数据太少，请换一个。"
-    tips_stupid = "你他妈输入的啥玩意儿"
+    tips_fund_error = const_values.tips_fund_error()
+    tips_stupid = const_values.tips_stupid()
     
     fund_code = input(tips_code)
-    if fund_code != "0":
+    if not (util_func.isExitCode(fund_code) or util_func.isLs(fund_code)):
         # 先查询历史净值
-        fund_history_filename = "./history/" + fund_code + ".txt"
-        fund_nav = internal_fund_data_process.do_get(fund_history_filename)
+        fund_nav = internal_fund_data_process.get_nav(fund_code)
         nav_amount = len(fund_nav)
         # 至少需要10个值才有意义处理这个基金
         while nav_amount < 10 and (fund_code != "0"):
             print(tips_fund_error)
             fund_code = input(tips_code)
-            fund_history_filename = "./history/" + fund_code + ".txt"
-            fund_nav = internal_fund_data_process.do_get(fund_history_filename)
+            fund_nav = internal_fund_data_process.get_nav(fund_code)
             nav_amount = len(fund_nav)
-    # 此处不用else是因为可能用户重新输入的code为0，需要再判断
-    if fund_code == "0":
-            return "0", "0", "0", "0", "0", "0", "0"
 
-    month_amount = int(input(tips_month_amount))
-    invest_years = int(input(tips_invest_years))
-    terminate_years = int(input(tips_terminate_years))
-    fee_rate = float(input(tips_fee_rate)) / 100.0
-    target_amount = int(input(tips_target_amount))
-
-    while target_amount < month_amount or invest_years < 1 or terminate_years < invest_years or month_amount < 1 or fee_rate < const_values.zero_float("NEG") or fee_rate > const_values.max_fee_rate():
-        print(tips_stupid)
+    if util_func.isExitCode(fund_code):
+        return const_values.special_code("EXIT"), "0", "0", "0", "0", "0", "0"
+    elif util_func.isLs(fund_code):
+        return const_values.special_code("LS"), "0", "0", "0", "0", "0", "0"
+    else:
         month_amount = int(input(tips_month_amount))
         invest_years = int(input(tips_invest_years))
         terminate_years = int(input(tips_terminate_years))
         fee_rate = float(input(tips_fee_rate)) / 100.0
         target_amount = int(input(tips_target_amount))
-    # 手续费0的修正
-    if fee_rate < const_values.zero_float():
-        fee_rate = 0.0
-    return fund_code, fund_nav, month_amount, invest_years, terminate_years, fee_rate, target_amount
+
+        while target_amount < month_amount or invest_years < 1 or terminate_years < invest_years or month_amount < 1 or fee_rate < const_values.zero_float("NEG") or fee_rate > const_values.max_fee_rate():
+            print(tips_stupid)
+            month_amount = int(input(tips_month_amount))
+            invest_years = int(input(tips_invest_years))
+            terminate_years = int(input(tips_terminate_years))
+            fee_rate = float(input(tips_fee_rate)) / 100.0
+            target_amount = int(input(tips_target_amount))
+        # 手续费0的修正
+        if util_func.is_float_zero(fee_rate):
+            fee_rate = 0.0
+        return fund_code, fund_nav, month_amount, invest_years, terminate_years, fee_rate, target_amount

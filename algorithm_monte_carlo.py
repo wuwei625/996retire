@@ -51,6 +51,6 @@ def get_nav_matrix(target_mean, target_var, array_amount, array_length):
             result.extend(sub_result[i].get())
     else:
         # 单进程
-        result = internal_get_nav_matrix(target_mean, target_var, array_amount, array_length).tolist()
+        result = internal_get_nav_matrix(target_mean, target_var, array_amount, array_length)
 
     return result
