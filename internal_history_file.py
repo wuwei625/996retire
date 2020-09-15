@@ -1,6 +1,6 @@
 # 涉及文件处理的函数
-import os
 import util_func
+import os
 
 # 遍历有记录的基金名称
 def fund_list(fund_history_dir):
