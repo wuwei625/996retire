@@ -57,7 +57,7 @@ def get_irr(net_cf, fv, guess = const_values.irr_guess()):
         current_guess += irr_step
     if abs(residual) > error_tolerance:
         # 如果经过所有尝试都无法得到结果，返回一个错误标记
-        return const_values.get_error_float()
+        return const_values.get_non_sense_float()
     else:
         # 返回基本符合计算结果的值
         return current_guess

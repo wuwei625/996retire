@@ -83,8 +83,8 @@ def error_tolerance():
 def irr_retry_limit():
     return 100000
 
-# 约定的报错时float的输出值
-def get_error_float():
+# 约定的无意义时float的输出值
+def get_non_sense_float():
     return -4444.44
 
 # 默认趸交年金利率

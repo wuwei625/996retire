@@ -9,8 +9,8 @@ def is_float_zero(test_float):
         return False
 
 # 判断float是否报错值
-def is_float_error(test_float):
-    if is_float_zero(test_float - const_values.get_error_float()):
+def is_float_non_sense(test_float):
+    if is_float_zero(test_float - const_values.get_non_sense_float()):
         return True
     else:
         return False

@@ -50,29 +50,35 @@ def mean_var_trans(fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm
     return expected_year_rate, expect_year_std_var
 
 # 获取Risk Adjusted Return
-def get_rar(fund_code):
+def get_rar(fund_code, risk_free_return):
     fund_nav = get_nav(fund_code)
-    rfr_d, var_d = analysis_fund(get_nav(const_values.special_code("ANNUAL")), 0)
     fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm_var = analysis_fund(fund_nav, 0)
     if (util_func.is_float_zero(fund_nav_increase_logarithm_var)):
-        return const_values.get_error_float()
+        return const_values.get_non_sense_float()
     else:
-        return (fund_nav_increase_logarithm_mean - rfr_d) / fund_nav_increase_logarithm_var
+        return (fund_nav_increase_logarithm_mean - risk_free_return) / fund_nav_increase_logarithm_var
 
 # 获取未排序基金列表
 def fund_list():
     return internal_history_file.fund_list(const_values.history_path())
 
-# 排序逻辑
-def cmp_fund(fund0, fund1):
-    if get_rar(fund0) < get_rar(fund1):
-        return 1
-    if get_rar(fund0) > get_rar(fund1):
-        return -1
-    return 0
-
 # 获取按Risk Adjusted Return排序的基金列表
-def rar_sorted_list():
-    raw_list = fund_list()
-    sorted_list = sorted(raw_list, key=functools.cmp_to_key(cmp_fund))
-    return sorted_list
+def rar_sorted_list(risk_free_return = const_values.get_non_sense_float()):
+    if util_func.is_float_non_sense(risk_free_return):
+        risk_free_return, var_d = analysis_fund(get_nav(const_values.special_code("ANNUAL")), 0)
+        
+    # 排序逻辑
+    def cmp_fund(fund0, fund1):
+        if get_rar(fund0, risk_free_return) < get_rar(fund1, risk_free_return):
+            return 1
+        if get_rar(fund0, risk_free_return) > get_rar(fund1, risk_free_return):
+            return -1
+        return 0
+
+    # 根据外部预设的无风险利率，对候选基金进行RAR排名
+    def rar_sorted_list():
+        raw_list = fund_list()
+        sorted_list = sorted(raw_list, key=functools.cmp_to_key(cmp_fund))
+        return sorted_list
+    
+    return rar_sorted_list()

@@ -27,7 +27,7 @@ if __name__ == "__main__":
     if (retire_fund_target > 1.0):
         irr_need = algorithm_tvm.get_irr(cf_investable, retire_fund_target)
         print("如果你想在退休后维持当前生活品质，你需要在退休时候攒出%.2f万元"%(retire_fund_target / 10000.0))
-        if util_func.is_float_error(irr_need):
+        if util_func.is_float_non_sense(irr_need):
             print("但是我算不出来你需要怎么投资才行，不排除你填是数据是错的。")
         else:
             print("你需要将现有投资性金融资产和每年结余以%.2f%%的收益率进行运用，才能达到目标。"%(irr_need * 100))
