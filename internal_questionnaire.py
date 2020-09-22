@@ -1,5 +1,6 @@
 import internal_fund_data_process
 import const_values
+import prompt
 import util_func
 
 def family_raw_data():
@@ -20,7 +21,7 @@ def family_raw_data():
     tips_current_non_liquidity = "你家目前的投资性金融资产有多少？（非货币基金、股票、万能投连险等用于投资增值的资产，单位：元）"
     tips_inflation = "你觉得通胀百分几（3%写3，我觉得3差不多）？"
     tips_income_growth = "你觉得收入增长百分几（3%写3，你要不会写就写3吧）？"
-    tips_stupid = const_values.tips_stupid()
+    tips_stupid = prompt.tips_stupid()
 
     print(tips)
     income_active = int(input(tips_income_active))
@@ -88,8 +89,8 @@ def family_raw_data():
     return income_active, income_passive, basic_expense, optional_expense, loan, loan_left, kid_expense, kid_left, insurance, insurance_left, retire_year, retire_income, inflation,current_liquidity, current_non_liquidity, income_growth
 
 def fund_analysis():
-    tips_code = const_values.tips_ask_fund()
-    tips_fund_error = const_values.tips_fund_error()
+    tips_code = prompt.tips_ask_fund()
+    tips_fund_error = prompt.tips_fund_error()
     
     fund_code = input(tips_code)
     if not (util_func.isExitCode(fund_code) or util_func.isLs(fund_code)):
@@ -111,14 +112,14 @@ def fund_analysis():
         return fund_code, fund_nav
 
 def fund_invest():
-    tips_code = const_values.tips_ask_fund()
+    tips_code = prompt.tips_ask_fund()
     tips_month_amount = "你每月想定投多少钱（按周定投没写，要的话自己改程序）？比如1000块就输入1000："
     tips_invest_years = "你想定投几年？"
     tips_terminate_years = "从第一笔开始算，几年结束投资？"
     tips_fee_rate = "交易手续费是百分几？输入0.5表示0.5%："
     tips_target_amount = "你觉得有多少钱算养老自由？比如想100万就输入1000000："
-    tips_fund_error = const_values.tips_fund_error()
-    tips_stupid = const_values.tips_stupid()
+    tips_fund_error = prompt.tips_fund_error()
+    tips_stupid = prompt.tips_stupid()
     
     fund_code = input(tips_code)
     if not (util_func.isExitCode(fund_code) or util_func.isLs(fund_code)):

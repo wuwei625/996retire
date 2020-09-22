@@ -3,17 +3,11 @@ import const_values
 
 # 判断float为0
 def is_float_zero(test_float):
-    if abs(test_float) <= const_values.zero_float():
-        return True
-    else:
-        return False
+    return abs(test_float) <= const_values.zero_float()
 
 # 判断float是否报错值
 def is_float_error(test_float):
-    if is_float_zero(test_float - const_values.get_error_float()):
-        return True
-    else:
-        return False
+    return is_float_zero(test_float - const_values.get_error_float())
 
 def isExitCode(code):
     return code == const_values.special_code("EXIT")
