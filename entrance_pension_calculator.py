@@ -4,6 +4,7 @@ import algorithm_tvm
 import ai_finance_plan
 import const_values
 import util_func
+import output_fund
 
 # 调试入口：退休计算器
 if __name__ == "__main__":
@@ -32,3 +33,5 @@ if __name__ == "__main__":
         else:
             print("你需要将现有投资性金融资产和每年结余以%.2f%%的收益率进行运用，才能达到目标。"%(irr_need * 100))
             print("以这个收益率进行运用并达到退休目标的前提是，没有任何低于预期的波动，因此通常你可能需要配置预期收益更高的风险性投资资产。")
+            print("以下基金可供参考（已根据你的目标进行优先排序）：")
+            output_fund.show_list((1 + irr_need) ** (1 / const_values.period_times("DAY")) - 1.0)

@@ -63,7 +63,7 @@ def fund_list():
     return internal_history_file.fund_list(const_values.history_path())
 
 # 获取按Risk Adjusted Return排序的基金列表
-def rar_sorted_list(risk_free_return = const_values.get_non_sense_float()):
+def rar_sorted_list(risk_free_return):
     if util_func.is_float_non_sense(risk_free_return):
         risk_free_return, var_d = analysis_fund(get_nav(const_values.special_code("ANNUAL")), 0)
         

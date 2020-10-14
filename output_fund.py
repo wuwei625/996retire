@@ -32,8 +32,8 @@ def show_single_fund_mean_and_var(fund_code, fund_nav):
         print (tips_error)
 
 # 显示基金池全部基金的核心分析并排序
-def show_list():
-    fund_list = internal_fund_data_process.rar_sorted_list()
+def show_list(risk_free_return = const_values.get_non_sense_float()):
+    fund_list = internal_fund_data_process.rar_sorted_list(risk_free_return)
     print("基金代码\t历史年化收益\t历史年化波动")
     for fund_code in fund_list:
         if not util_func.isAnnualCode(fund_code):
