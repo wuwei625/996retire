@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import internal_family_data
 import internal_questionnaire
 import algorithm_tvm

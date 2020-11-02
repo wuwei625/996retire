@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # 基金定投的调试入口
 
 import internal_questionnaire
