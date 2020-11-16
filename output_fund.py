@@ -4,6 +4,7 @@ import util_func
 import internal_fund_data_process
 import internal_timing_invest_simulate
 import algorithm_monte_carlo
+import algorithm_geometric_mean
 
 import time
 import numpy
@@ -79,8 +80,8 @@ def show_timing(fund_nav, invest_years, terminate_years, month_amount, fee_rate,
                 else:
                     final_values_2.append(single_account_values[-1])
             # 计算均值
-            expected_final_value = int(numpy.average(final_values))
-            expected_final_value_2 = int(numpy.average(final_values_2))
+            expected_final_value = int(algorithm_geometric_mean.get_geometric_mean(final_values))
+            expected_final_value_2 = int(algorithm_geometric_mean.get_geometric_mean(final_values_2))
             # 计算成功率
             total_cases = len(account_values_simulate)
             half_way_success_rate = 10000 * half_way_success_case_amount / total_cases / 100.00
@@ -104,7 +105,7 @@ def show_single(fund_nav, terminate_years, init_amount, fee_rate, fund_code, tar
 
 # 投资结果图表展示
 def showchart(final_values, fund_code, default_max_value=0):
-    expected_final_value = int(numpy.average(final_values))
+    expected_final_value = int(algorithm_geometric_mean.get_geometric_mean(final_values))
     final_value_std = int(numpy.std(final_values))
     total_cases = len(final_values)
 
