@@ -45,6 +45,7 @@ def show_list(risk_free_return = const_values.get_non_sense_float()):
 # 定投结果显示
 def show_timing(fund_nav, invest_years, terminate_years, month_amount, fee_rate, fund_code, target_amount):
     final_values = []
+    final_values_2 = [] # 见好就收模式的终值
     half_way_success_case_amount = 0
     final_success_case_amount = 0
 
@@ -58,7 +59,12 @@ def show_timing(fund_nav, invest_years, terminate_years, month_amount, fee_rate,
             # 获取test_times组模拟净值
             fund_nav_simulate = algorithm_monte_carlo.get_nav_matrix(fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm_var, const_values.test_times(), terminate_years * const_values.days("YEAR"))
             # 获取对应的账户价值
-            invest_times = invest_years * const_values.period_times("MONTH")
+            if invest_years > 0:
+                # 定投模式
+                invest_times = invest_years * const_values.period_times("MONTH")
+            else:
+                # 一次性模式
+                invest_times = 1
             account_values_simulate = internal_timing_invest_simulate.get_simulated_asset_values(const_values.days("MONTH"), invest_times, month_amount, fee_rate, fund_nav_simulate)
             for single_account_values in account_values_simulate:
                 # 记录账户终值
@@ -69,8 +75,12 @@ def show_timing(fund_nav, invest_years, terminate_years, month_amount, fee_rate,
                     final_success_case_amount += 1
                 if max(single_account_values) >= target_amount:
                     half_way_success_case_amount += 1
+                    final_values_2.append(target_amount)
+                else:
+                    final_values_2.append(single_account_values[-1])
             # 计算均值
             expected_final_value = int(numpy.average(final_values))
+            expected_final_value_2 = int(numpy.average(final_values_2))
             # 计算成功率
             total_cases = len(account_values_simulate)
             half_way_success_rate = 10000 * half_way_success_case_amount / total_cases / 100.00
@@ -78,23 +88,28 @@ def show_timing(fund_nav, invest_years, terminate_years, month_amount, fee_rate,
             # 打印结果
             t = time.time() - t
             # print("计算耗时：" , t, "s")
-            print("如果闭眼按计划定投，你的账户终值的预期值是%.2f万元，并有%.2f%%的概率在投资周期结束时实现养老自由。"%(expected_final_value/10000.0,final_success_rate))
-            print("如果决定见好就收的话，你有%.2f%%的概率在投资周期结束时或者之前，实现养老自由。"%(half_way_success_rate))
+            print("如果闭眼按计划投资，你的账户终值的预期值是%.2f万元，并有%.2f%%的概率在投资周期结束时实现目标。"%(expected_final_value/10000.0, final_success_rate))
+            print("如果决定见好就收的话，你的账户终值的预期值是%.2f万元，你有%.2f%%的概率在投资周期结束时或者之前，实现投资目标。"%(expected_final_value_2/10000.0, half_way_success_rate))
             if (fund_code != const_values.special_code("ANUAL")):
-                showchart(final_values, fund_code)
+                default_max_value = showchart(final_values, fund_code)
+                showchart(final_values_2, fund_code, default_max_value)
             else:
                 print("年金没有不确定性，不产生图表。")
     else:
         print ("错误信息：没有获取到净值历史，或者数据太少，无法完成操作。")
-    
-# 定投结果图表展示
-def showchart(final_values, fund_code):
+
+# 一次性投资结果显示
+def show_single(fund_nav, terminate_years, init_amount, fee_rate, fund_code, target_amount):
+    show_timing(fund_nav, 0, terminate_years, init_amount, fee_rate, fund_code, target_amount)
+
+# 投资结果图表展示
+def showchart(final_values, fund_code, default_max_value=0):
     expected_final_value = int(numpy.average(final_values))
     final_value_std = int(numpy.std(final_values))
     total_cases = len(final_values)
 
-    d = max(min(expected_final_value // 5, final_value_std // 2), expected_final_value // 20 + 1)
-    num_bin = range(int(min(final_values)), min(final_value_std * 4, int(max(final_values))), d)
+    d = max(min(expected_final_value // 5, final_value_std // 2), expected_final_value // 20 + 1, default_max_value // 20)
+    num_bin = range(int(min(final_values)), max(default_max_value, min(expected_final_value + final_value_std * 6, int(max(final_values)))), d)
     plt.figure(figsize=(20,8),dpi=80)
     plt.hist(final_values, num_bin)
     plt.xticks(num_bin)
@@ -103,3 +118,6 @@ def showchart(final_values, fund_code):
     plt.title("Final value distribution under your plan, fund code:" + fund_code,size=25)
     plt.grid(alpha=2.0)
     plt.show()
+
+    # 返回图表域最大值给下一次展示使用
+    return min(expected_final_value + final_value_std * 6, int(max(final_values)))

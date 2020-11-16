@@ -51,7 +51,7 @@ def max_fee_rate():
 
 # 蒙特卡洛测试次数
 def test_times():
-    return 7000
+    return 30000
 
 # 退休后第一阶段时长（维持可选消费标准不变的时间）
 def year_after_retire_with_optional():

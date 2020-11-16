@@ -111,7 +111,7 @@ def fund_analysis():
     else:    
         return fund_code, fund_nav
 
-def fund_invest():
+def fund_invest_timing():
     tips_code = prompt.tips_ask_fund()
     tips_month_amount = "你每月想定投多少钱（按周定投没写，要的话自己改程序）？比如1000块就输入1000："
     tips_invest_years = "你想定投几年？"
@@ -155,3 +155,45 @@ def fund_invest():
         if util_func.is_float_zero(fee_rate):
             fee_rate = 0.0
         return fund_code, fund_nav, month_amount, invest_years, terminate_years, fee_rate, target_amount
+
+def fund_invest_single():
+    tips_code = prompt.tips_ask_fund()
+    tips_init_amount = "你想投入多少钱？比如1000块就输入1000："
+    tips_terminate_years = "你想投资几年？"
+    tips_fee_rate = "交易手续费是百分几？输入0.5表示0.5%："
+    tips_target_amount = "你的投资目标是："
+    tips_fund_error = prompt.tips_fund_error()
+    tips_stupid = prompt.tips_stupid()
+    
+    fund_code = input(tips_code)
+    if not (util_func.isExitCode(fund_code) or util_func.isLs(fund_code)):
+        # 先查询历史净值
+        fund_nav = internal_fund_data_process.get_nav(fund_code)
+        nav_amount = len(fund_nav)
+        # 至少需要10个值才有意义处理这个基金
+        while nav_amount < 10 and (fund_code != "0"):
+            print(tips_fund_error)
+            fund_code = input(tips_code)
+            fund_nav = internal_fund_data_process.get_nav(fund_code)
+            nav_amount = len(fund_nav)
+
+    if util_func.isExitCode(fund_code):
+        return const_values.special_code("EXIT"), "0", "0", "0", "0", "0"
+    elif util_func.isLs(fund_code):
+        return const_values.special_code("LS"), "0", "0", "0", "0", "0"
+    else:
+        init_amount = int(input(tips_init_amount))
+        terminate_years = int(input(tips_terminate_years))
+        fee_rate = float(input(tips_fee_rate)) / 100.0
+        target_amount = int(input(tips_target_amount))
+
+        while target_amount < init_amount or terminate_years < 1 or init_amount < 1 or fee_rate < const_values.zero_float("NEG") or fee_rate > const_values.max_fee_rate():
+            print(tips_stupid)
+            init_amount = int(input(tips_init_amount))
+            terminate_years = int(input(tips_terminate_years))
+            fee_rate = float(input(tips_fee_rate)) / 100.0
+            target_amount = int(input(tips_target_amount))
+        # 手续费0的修正
+        if util_func.is_float_zero(fee_rate):
+            fee_rate = 0.0
+        return fund_code, fund_nav, init_amount, terminate_years, fee_rate, target_amount
