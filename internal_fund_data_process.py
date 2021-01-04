@@ -12,25 +12,32 @@ def get_nav(fund_code):
     fund_nav = internal_history_file.get_nav_from_file(fund_history_filename)
     return fund_nav
 
-# 获取日增长率均值和方差
-def analysis_fund(fund_nav, max_nav):
+# 获取基金日增长率序列
+def get_nav_daily_increase_logarithm(fund_nav, max_nav):
     fund_nav_increase = []
     fund_nav_increase_logarithm = []
-    fund_nav_increase_logarithm_mean = 0.0
-    fund_nav_increase_logarithm_var = 0.0
 
-    # 如果有限制长度（合法值是大于10的整数）则截取靠后长度个数的净值
-    if (max_nav > 10 and max_nav < len(fund_nav)):
+    # 如果有限制长度则截取靠后长度个数的净值
+    if (max_nav > const_values.min_nav_count() and max_nav < len(fund_nav)):
         fund_nav = fund_nav[-max_nav:]
 
-    # 净值数据超过10个方才予以统计
-    if len(fund_nav) > 10:
+    # 净值数据超过const_values.min_nav_count()个方才予以统计
+    if len(fund_nav) > const_values.min_nav_count():
         i = 0
         # 根据净值，获取日增长率对数
         while i < len(fund_nav) - 1:
             fund_nav_increase.append(fund_nav[i + 1] / fund_nav[i])
             fund_nav_increase_logarithm.append(math.log(fund_nav_increase[i]))
             i += 1
+    return fund_nav_increase_logarithm
+
+# 获取日增长率均值和方差
+def analysis_fund(fund_nav, max_nav):
+    fund_nav_increase_logarithm = get_nav_daily_increase_logarithm(fund_nav, max_nav)
+    fund_nav_increase_logarithm_mean = 0.0
+    fund_nav_increase_logarithm_var = 0.0
+
+    if len(fund_nav_increase_logarithm) > const_values.min_nav_count():
         # 计算均值和方差
         fund_nav_increase_logarithm_mean = numpy.mean(fund_nav_increase_logarithm)
         fund_nav_increase_logarithm_var = numpy.var(fund_nav_increase_logarithm)

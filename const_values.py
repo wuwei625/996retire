@@ -4,6 +4,10 @@
 def history_path():
     return "./history/"
 
+# 最短可接受净值序列长度
+def min_nav_count():
+    return 10
+
 def special_code(special_type = "EXIT"):
     if special_type == "EXIT":
         return "0"
