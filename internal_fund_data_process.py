@@ -12,7 +12,7 @@ def get_nav(fund_code):
     fund_nav = internal_history_file.get_nav_from_file(fund_history_filename)
     return fund_nav
 
-# 获取基金日增长率序列
+# 获取基金日增长率对数序列
 def get_nav_daily_increase_logarithm(fund_nav, max_nav):
     fund_nav_increase = []
     fund_nav_increase_logarithm = []
@@ -31,9 +31,13 @@ def get_nav_daily_increase_logarithm(fund_nav, max_nav):
             i += 1
     return fund_nav_increase_logarithm
 
-# 获取日增长率均值和方差
+# 获取日增长率对数的均值和方差
 def analysis_fund(fund_nav, max_nav):
     fund_nav_increase_logarithm = get_nav_daily_increase_logarithm(fund_nav, max_nav)
+    return analysis_by_nav_increase_logarithm(fund_nav_increase_logarithm)
+
+# 通过日增长率对数序列来获取日增长率对数均值和方差
+def analysis_by_nav_increase_logarithm(fund_nav_increase_logarithm):
     fund_nav_increase_logarithm_mean = 0.0
     fund_nav_increase_logarithm_var = 0.0
 
