@@ -5,6 +5,7 @@ import internal_fund_data_process
 import internal_timing_invest_simulate
 import algorithm_monte_carlo
 import algorithm_geometric_mean
+import key_settings
 
 import time
 import numpy
@@ -18,7 +19,7 @@ def show_single_fund_mean_and_var(fund_code, fund_nav):
     nav_amount = len(fund_nav)
     if nav_amount > 10:
         print("共导入" + str(nav_amount) + "个历史净值参与分析")
-        fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm_var = internal_fund_data_process.analysis_fund(fund_nav, 0)
+        fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm_var = internal_fund_data_process.analysis_fund(fund_nav, key_settings.max_nav())
         if util_func.is_float_zero(fund_nav_increase_logarithm_mean) and util_func.is_float_zero(fund_nav_increase_logarithm_var):
             print(tips_warning)
         else:
@@ -39,7 +40,7 @@ def show_list(risk_free_return = const_values.get_non_sense_float()):
     for fund_code in fund_list:
         if not util_func.isAnnualCode(fund_code):
             fund_nav = internal_fund_data_process.get_nav(fund_code)
-            fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm_var = internal_fund_data_process.analysis_fund(fund_nav, 0)
+            fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm_var = internal_fund_data_process.analysis_fund(fund_nav, key_settings.max_nav())
             expected_year_rate, expect_year_std_var = internal_fund_data_process.mean_var_trans(fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm_var, const_values.days("YEAR"))
             print("%s\t\t%.2f%%\t\t%.2f%%"%(fund_code, (expected_year_rate - 1.0) * 100, expect_year_std_var * 100))
 
@@ -53,7 +54,7 @@ def show_timing(fund_nav, invest_years, terminate_years, month_amount, fee_rate,
     nav_amount = len(fund_nav)
     t = time.time()
     if nav_amount > 10:
-        fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm_var = internal_fund_data_process.analysis_fund(fund_nav, 0)
+        fund_nav_increase_logarithm_mean, fund_nav_increase_logarithm_var = internal_fund_data_process.analysis_fund(fund_nav, key_settings.max_nav())
         if util_func.is_float_zero(fund_nav_increase_logarithm_mean) and util_func.is_float_zero(fund_nav_increase_logarithm_var):
             print("错误信息：基金历史未获得正确结果！")
         else:

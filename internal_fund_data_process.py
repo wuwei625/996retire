@@ -1,6 +1,7 @@
 import util_func
 import const_values
 import internal_history_file
+import key_settings
 
 import math
 import numpy
@@ -33,7 +34,7 @@ def get_nav_daily_increase_logarithm(fund_nav, max_nav):
 
 # 获取日增长率对数的均值和方差
 def analysis_fund(fund_nav, max_nav):
-    fund_nav_increase_logarithm = get_nav_daily_increase_logarithm(fund_nav, max_nav)
+    fund_nav_increase_logarithm = get_nav_daily_increase_logarithm(fund_nav, key_settings.max_nav())
     return analysis_by_nav_increase_logarithm(fund_nav_increase_logarithm)
 
 # 通过日增长率对数序列来获取日增长率对数均值和方差
