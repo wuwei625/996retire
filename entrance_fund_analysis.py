@@ -19,5 +19,5 @@ if __name__ == "__main__":
             output_fund.show_list(0.0004)   
         else:
             output_fund.show_single_fund_mean_and_var(fund_code, fund_nav)
-        fund_code, fund_nav = internal_questionnaire.fund_analysis()
+            fund_code, fund_nav = internal_questionnaire.fund_analysis()
     exit()
